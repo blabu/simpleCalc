@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<header>
+    <title>Calc</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <style type="text/css">
+        div#Result {
+            position: relative;
+            width: 91%;
+            height:10em;
+            border-width :1px;
+            border-style: solid;
+        }
+        #main {
+            border-width: 2px;
+            border-color: darkblue;
+            border-style: solid;
+            position: absolute;
+            right: 30%;
+            left:30%;
+            padding: 10px;
+            margin: 10px;
+        }
+        p#res {
+            
+            font-size: 30px;
+        }
+        #prevValue {
+            position: relative;
+            font-size: 30px;
+        }
+        div.btn, div#equal, div.sign, div#reset{
+           width: 30%;
+           height:10%;
+           border-width: 1px; 
+           border-style: solid;
+           overflow: hidden;
+           float:left;
+        }
+        div.btn:hover, div.sign:hover {
+            background-color: beige;
+        }
+        div#equal:hover, div#reset:hover {
+            background-color: coral;
+        }
+        p.button {
+            color: blue;
+            align-self: stretch;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            font-size: 30px;
+        }
+    </style>
+</header>
+<body>
+    <div id="main">
+        <div id="Result">
+            <p id="prevValue"></p>
+            <p id="res"></p>
+        </div>
+        <div class="btn" id="1"><p class="button">1</p></div>
+        <div class="btn" id="2"><p class="button">2</p></div>
+        <div class="btn" id="3"><p class="button">3</p></div>
+        <div class="btn" id="4"><p class="button">4</p></div>
+        <div class="btn" id="5"><p class="button">5</p></div>
+        <div class="btn" id="6"><p class="button">6</p></div>
+        <div class="btn" id="7"><p class="button">7</p></div>
+        <div class="btn" id="8"><p class="button">8</p></div>
+        <div class="btn" id="9"><p class="button">9</p></div>
+        <div class="btn" id="0"><p class="button">0</p></div>
+        <div class="sign" id="mult"><p class="button">*</p></div>
+        <div class="sign" id="div"><p class="button">/</p></div>
+        <div class="sign" id="add"><p class="button">+</p></div>
+        <div class="sign" id="sub"><p class="button">-</p></div>
+        <div id="equal"><p class="button">=</p></div>
+        <div id="reset"><p class="button">C</p></div>
+    </div>
+    <script>
+        "use strict";
+        var calculate = {
+            setOperand(value) {
+                if(isNaN(this.val1)) {
+                    console.log("set value2 " + value); 
+                    this.val1 = value;
+                } 
+                else if(isNaN(this.val2)) {
+                    console.log("set value2 " + value);
+                    this.val2 = value;
+                }
+                return this;
+            },
+            setOperation(op) {
+                this.operation = op;
+            },
+            calc() {
+                switch(this.operation) {
+                    case '+':
+                        return (+this.val1) + (+this.val2);
+                    case '-':
+                        return +this.val1 - this.val2;
+                    case '*':
+                        return +this.val1 * this.val2;
+                    case '/':
+                        return +this.val1 / this.val2;
+                    default:
+                        console.log("Operation not implemented", this.operation);
+                }
+            },
+            reset(){
+                this.val1 = "reset";
+                this.val2 = "reset";
+            }
+        }
+        let allBtn = document.getElementsByClassName("btn");
+        for(let i=0; i<allBtn.length; i++) {
+            allBtn[i].addEventListener("click",(element) => {
+                console.log(element);
+                document.getElementById("res").innerText += element.target.textContent;
+            })
+        }
+        let signBtn = document.getElementsByClassName("sign");
+        for(let i=0; i<signBtn.length; i++) {
+            signBtn[i].addEventListener("click", (element) => {
+                console.log(element);
+                let val = document.getElementById("res");
+                calculate.setOperand(val.innerText);
+                document.getElementById("prevValue").innerText = val.innerText + element.target.textContent;
+                val.innerText = "";
+                calculate.setOperation(element.target.textContent);
+            })
+        }
+        let equalBtn = document.getElementById("equal");
+        equalBtn.addEventListener("click",(element)=> {
+            console.log(element);
+            let val = document.getElementById("res");
+            calculate.setOperand(val.innerText);
+            document.getElementById("prevValue").innerText += val.innerText + "=";
+            val.innerText = calculate.calc();
+            calculate.reset();
+        })
+        document.getElementById("reset").addEventListener("click", (element)=>{
+            console.log(element);
+            document.getElementById("res").innerText = "";
+            document.getElementById("prevValue").innerText = "";
+            calculate.reset();
+        })
+        document.addEventListener("keypress", (event)=> {
+            switch(event.key) {
+            case "Enter": { 
+                    let val = document.getElementById("res");
+                    calculate.setOperand(val.innerText);
+                    document.getElementById("prevValue").innerText += val.innerText  + "=";
+                    val.innerText = calculate.calc();
+                    calculate.reset();
+                    return;
+                }
+            case "r": {
+                document.getElementById("res").innerText = "";
+                document.getElementById("prevValue").innerText = "";
+                calculate.reset();
+                return;
+            }
+            case '0': case '1': case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                document.getElementById("res").innerText += event.key;
+                return;
+            case '*': case '/':case '+': case '-': {
+                    let val = document.getElementById("res");
+                    calculate.setOperand(val.innerText);
+                    calculate.setOperation(event.key);
+                    document.getElementById("prevValue").innerText = val.innerText + event.key;
+                    val.innerText = "";
+                    return;
+                }
+            default:
+                console.err("Error undefined button ", element.key);
+            }
+        });
+    </script>
+</body>
